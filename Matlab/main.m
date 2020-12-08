@@ -35,13 +35,16 @@ M = 10; % Число базисных функций
 % чтобы совпало с граничными условиями
 
 y = get_init_population(func.V, a, b, N, M);
+epochs = 200;
+F_best = zeros(1, epochs);
 
-for k=1:200
+for k=1:epochs
     % Отбор
     y = selection(y, func.V, a, b, N, M);
     
     % Выведем значение функции приспособленности для лучшей особи
-    fprintf('%11.10f\n',y{1,2}); 
+    F_best(k) = y{1,2};
+    % fprintf('%11.10f\n',F_best(k)); 
     
     % Скрещивание
     y = crossing(y, func.V, a, b, N, M);
@@ -53,9 +56,39 @@ end
 %% Вывод результатов на экран
 y = selection(y, func.V, a, b, N, M);
 
+figure;
+plot(F_best)
+xlabel('epoch')
+ylabel('best of F')
+task_name={'test', 'main'};
+base_name={'sin(nx)', 'x^n * (x-pi)^n', 'x^n'};
+title({['Зависимость функции приспособления от популяции'];
+    [' для задачи ', task_name{task+1},' с базисом ', base_name{base+1}]})
+grid on; grid minor;
+
+
 fprintf('the best score: %7.6f \nof coeff %s\n',y{1,2}, sprintf('%d ', y{1,1}))
 best = num2cell(y{1,1});
+
+if task == 0 % Вручную отнормируем на константу
+   best{1} = 0; 
+end
 digits(5);
 disp('Наилучшая пробная функция:')
 disp(vpa(expand(func.y(best{1:end},x))))
 
+if task == 0 % Для основной задачи надо вручную изменять константы
+    figure;
+    subplot(1,2,1);
+    fplot(func.analit_sol,[0,pi])
+    hold on;
+    fplot(matlabFunction(func.y(best{1:end},x)),[0,pi]);
+    title('Сравнение численного и аналитического решений');
+    legend('Аналитическое','Численное')
+    grid on; grid minor;
+    
+    subplot(1,2,2);
+    fplot(matlabFunction(abs(func.y(best{1:end},x) - func.analit_sol(x))),[0,pi]);
+    title('Модуль разности численного и аналитического решений');
+    grid on; grid minor;
+end

@@ -10,17 +10,17 @@ switch base
     case 0
         % sin(nx)
         for n=0:M
-            basefunc{n+1} = subs(sym('(sin(n*x))'));
+            basefunc{n+1} = subs(str2sym('(sin(n*x))'));
         end
     case 1
         % x^n*(x-pi)^n
         for n=0:M
-            basefunc{n+1} = subs(sym('(x^n*(x-pi)^n)'));
+            basefunc{n+1} = subs(str2sym('(x^n*(x-pi)^n)'));
         end
     case 2
         % x^n
         for n=0:M
-            basefunc{n+1} = subs(sym('(x^n)'));
+            basefunc{n+1} = subs(str2sym('(x^n)'));
         end
 end
 %% Зададим символьное выражение для пробной функции
